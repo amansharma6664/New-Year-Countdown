@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const calculateTimeLeft = () => {
+    const newYear = new Date("January 1, 2025 00:00:00");
+    const now = new Date();
+    const difference = newYear - now;
+
+    let timeLeft = {};
+    if (difference > 0) {
+      timeLeft = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    }
+    return timeLeft;
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const timerComponents = Object.keys(timeLeft).map((interval) => (
+    <div key={interval} className="timer-section">
+      <span className="timer-number">{timeLeft[interval]}</span>
+      <span className="timer-label">{interval}</span>
+    </div>
+  ));
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="countdown-container">
+        <h1>🎉 New Year Countdown 🎉</h1>
+        <div className="timer">{timerComponents.length ? timerComponents : <span>Happy New Year! 🎆</span>}</div>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
